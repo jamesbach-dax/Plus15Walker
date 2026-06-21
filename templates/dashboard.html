@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — +15 Partner Portal{% endblock %}
+{% block content %}
+<h1>Dashboard</h1>
+<p class="muted">Overview of partners and live promotions across the +15 network.</p>
+
+<div class="stat-grid">
+  <div class="card stat"><div class="stat-v">{{ stats.partners }}</div><div class="stat-l">Total partners</div></div>
+  <div class="card stat"><div class="stat-v">{{ stats.active }}</div><div class="stat-l">Active</div></div>
+  <div class="card stat"><div class="stat-v">{{ stats.buildings }}</div><div class="stat-l">Buildings</div></div>
+  <div class="card stat"><div class="stat-v">{{ stats.promos }}</div><div class="stat-l">Live promotions</div></div>
+</div>
+
+<div class="two-col">
+  <div class="card">
+    <h2>Partners by category</h2>
+    <table class="mini">
+      <tbody>
+      {% for row in by_category %}
+        <tr><td>{{ row.name }}</td><td class="num">{{ row.n }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h2>Featured live promotions</h2>
+    {% if featured %}
+      <ul class="promo-list">
+      {% for p in featured %}
+        <li><strong>{{ p.title }}</strong><span class="muted"> — {{ p.business_name }}</span><span class="tag">ends {{ p.end_date }}</span></li>
+      {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted">No featured promotions running right now.</p>
+    {% endif %}
+  </div>
+</div>
+
+<div class="actions-row">
+  <a class="btn btn-primary" href="{{ url_for('create_partner') }}">+ Add a partner</a>
+  <a class="btn" href="{{ url_for('list_partners') }}">View all partners</a>
+</div>
+{% endblock %}

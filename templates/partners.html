@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Partners — +15 Partner Portal{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Partners</h1>
+  {% if current_role != 'viewer' %}
+  <a class="btn btn-primary" href="{{ url_for('create_partner') }}">+ Add partner</a>
+  {% endif %}
+</div>
+
+<form class="filters" method="get" action="{{ url_for('list_partners') }}">
+  <input type="text" name="q" value="{{ q }}" placeholder="Search name or description…">
+  <select name="category">
+    <option value="">All categories</option>
+    {% for c in categories %}
+      <option value="{{ c.category_id }}" {% if cat == c.category_id|string %}selected{% endif %}>{{ c.name }}</option>
+    {% endfor %}
+  </select>
+  <select name="status">
+    <option value="">Any status</option>
+    {% for s in ['active','pending','suspended','closed'] %}
+      <option value="{{ s }}" {% if status == s %}selected{% endif %}>{{ s|capitalize }}</option>
+    {% endfor %}
+  </select>
+  <button class="btn" type="submit">Filter</button>
+  {% if q or cat or status %}<a class="btn btn-ghost" href="{{ url_for('list_partners') }}">Clear</a>{% endif %}
+</form>
+
+<div class="card">
+  <table class="data">
+    <thead>
+      <tr><th>Business</th><th>Category</th><th>Building</th><th>Status</th><th class="ta-r">Actions</th></tr>
+    </thead>
+    <tbody>
+      {% for p in partners %}
+      <tr>
+        <td><a href="{{ url_for('view_partner', partner_id=p.partner_id) }}"><strong>{{ p.business_name }}</strong></a>
+          {% if p.unit_number %}<span class="muted"> · {{ p.unit_number }}</span>{% endif %}</td>
+        <td>{{ p.category_name }}</td>
+        <td>{{ p.building_name }}</td>
+        <td><span class="badge badge-{{ p.status }}">{{ p.status }}</span></td>
+        <td class="ta-r">
+          <a class="btn btn-sm" href="{{ url_for('view_partner', partner_id=p.partner_id) }}">View</a>
+          {% if current_role != 'viewer' %}
+          <a class="btn btn-sm" href="{{ url_for('edit_partner', partner_id=p.partner_id) }}">Edit</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="muted ta-c">No partners match your filters.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<p class="muted count">{{ partners|length }} partner(s) shown.</p>
+{% endblock %}

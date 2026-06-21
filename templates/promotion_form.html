@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if mode=='edit' else 'New' }} promotion — +15 Partner Portal{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>{{ 'Edit promotion' if mode=='edit' else 'New promotion' }}</h1>
+  <a class="btn btn-ghost" href="{{ url_for('view_partner', partner_id=partner.partner_id) }}">← Back to {{ partner.business_name }}</a>
+</div>
+<form class="card form" method="post">
+  <label class="req">Title
+    <input type="text" name="title" required value="{{ promo.title if promo else '' }}">
+  </label>
+  <label>Details
+    <textarea name="details" rows="2">{{ promo.details if promo else '' }}</textarea>
+  </label>
+  <div class="grid-2">
+    <label>Discount %
+      <input type="number" name="discount_pct" min="0" max="100"
+             value="{{ promo.discount_pct if promo and promo.discount_pct is not none else '' }}">
+    </label>
+    <label class="check">
+      <input type="checkbox" name="is_featured" {% if promo and promo.is_featured %}checked{% endif %}>
+      Feature this promotion
+    </label>
+    <label class="req">Start date
+      <input type="date" name="start_date" required value="{{ promo.start_date if promo else '' }}">
+    </label>
+    <label class="req">End date
+      <input type="date" name="end_date" required value="{{ promo.end_date if promo else '' }}">
+    </label>
+  </div>
+  <div class="form-actions">
+    <button class="btn btn-primary" type="submit">{{ 'Save changes' if mode=='edit' else 'Add promotion' }}</button>
+    <a class="btn btn-ghost" href="{{ url_for('view_partner', partner_id=partner.partner_id) }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

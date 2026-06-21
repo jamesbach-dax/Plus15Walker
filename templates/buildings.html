@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Buildings — +15 Partner Portal{% endblock %}
+{% block content %}
+<h1>+15 Buildings</h1>
+<p class="muted">Reference data seeded from the City of Calgary open “Plus 15” dataset. Each building can host many partners.</p>
+<div class="card">
+  <table class="data">
+    <thead><tr><th>Building</th><th>Quadrant</th><th class="num">Partners</th></tr></thead>
+    <tbody>
+      {% for b in buildings %}
+      <tr><td><strong>{{ b.name }}</strong></td><td>{{ b.quadrant or '—' }}</td><td class="num">{{ b.partner_count }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

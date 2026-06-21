@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if mode=='edit' else 'New' }} partner — +15 Partner Portal{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>{{ 'Edit partner' if mode=='edit' else 'Add a new partner' }}</h1>
+  <a class="btn btn-ghost" href="{{ url_for('list_partners') }}">← Back to partners</a>
+</div>
+
+{# The same form is reused for Create and Update. On edit, fields are pre-filled
+   from the `partner` record so the steward sees current values before changing. #}
+<form class="card form" method="post">
+  <div class="grid-2">
+    <label class="req">Business name
+      <input type="text" name="business_name" required
+             value="{{ partner.business_name if partner else '' }}">
+    </label>
+    <label>Unit / suite
+      <input type="text" name="unit_number"
+             value="{{ partner.unit_number if partner else '' }}">
+    </label>
+    <label class="req">Building
+      <select name="building_id" required>
+        <option value="">— choose —</option>
+        {% for b in buildings %}
+          <option value="{{ b.building_id }}"
+            {% if partner and partner.building_id == b.building_id %}selected{% endif %}>{{ b.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label class="req">Category
+      <select name="category_id" required>
+        <option value="">— choose —</option>
+        {% for c in categories %}
+          <option value="{{ c.category_id }}"
+            {% if partner and partner.category_id == c.category_id %}selected{% endif %}>{{ c.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Contact name
+      <input type="text" name="contact_name" value="{{ partner.contact_name if partner else '' }}">
+    </label>
+    <label>Contact email
+      <input type="email" name="contact_email" value="{{ partner.contact_email if partner else '' }}">
+    </label>
+    <label>Contact phone
+      <input type="text" name="contact_phone" value="{{ partner.contact_phone if partner else '' }}">
+    </label>
+    <label>Status
+      <select name="status">
+        {% for s in ['active','pending','suspended','closed'] %}
+          <option value="{{ s }}" {% if partner and partner.status==s %}selected{% endif %}>{{ s|capitalize }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </div>
+  <label>Public description
+    <textarea name="description" rows="3">{{ partner.description if partner else '' }}</textarea>
+  </label>
+  <div class="form-actions">
+    <button class="btn btn-primary" type="submit">{{ 'Save changes' if mode=='edit' else 'Create partner' }}</button>
+    <a class="btn btn-ghost" href="{{ url_for('list_partners') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

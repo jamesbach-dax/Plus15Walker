@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}{{ partner.business_name }} — +15 Partner Portal{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ partner.business_name }}</h1>
+    <p class="muted">{{ partner.category_name }} · {{ partner.building_name }}
+      ({{ partner.quadrant }}){% if partner.unit_number %} · {{ partner.unit_number }}{% endif %}
+      <span class="badge badge-{{ partner.status }}">{{ partner.status }}</span></p>
+  </div>
+  {% if current_role != 'viewer' %}
+  <div class="head-actions">
+    <a class="btn" href="{{ url_for('edit_partner', partner_id=partner.partner_id) }}">Edit</a>
+    {# DELETE is a POST inside a confirm dialog to avoid accidental removal #}
+    <form method="post" action="{{ url_for('delete_partner', partner_id=partner.partner_id) }}"
+          onsubmit="return confirm('Delete {{ partner.business_name }} and ALL its promotions, hours and lease? This cannot be undone.');">
+      <button class="btn btn-danger" type="submit">Delete</button>
+    </form>
+  </div>
+  {% endif %}
+</div>
+
+<div class="two-col">
+  <div class="card">
+    <h2>Contact</h2>
+    <dl class="kv">
+      <dt>Contact</dt><dd>{{ partner.contact_name or '—' }}</dd>
+      <dt>Email</dt><dd>{{ partner.contact_email or '—' }}</dd>
+      <dt>Phone</dt><dd>{{ partner.contact_phone or '—' }}</dd>
+      <dt>Description</dt><dd>{{ partner.description or '—' }}</dd>
+      <dt>Added</dt><dd>{{ partner.created_at }}</dd>
+    </dl>
+  </div>
+  <div class="card">
+    <h2>Opening hours</h2>
+    <table class="mini">
+      <tbody>
+      {% for h in hours %}
+        <tr><td>{{ days[h.day_of_week] }}</td>
+          <td class="ta-r">{% if h.is_closed %}<span class="muted">Closed</span>{% else %}{{ h.open_time }}–{{ h.close_time }}{% endif %}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% if lease %}
+    <h2 style="margin-top:1rem">Lease</h2>
+    <dl class="kv">
+      <dt>Term</dt><dd>{{ lease.start_date }} → {{ lease.end_date }}</dd>
+      <dt>Monthly rent</dt><dd>${{ '%.2f'|format(lease.monthly_rent) }}</dd>
+      <dt>Status</dt><dd>{{ lease.status }}</dd>
+    </dl>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card">
+  <div class="page-head">
+    <h2>Promotions</h2>
+    {% if current_role != 'viewer' %}
+    <a class="btn btn-sm btn-primary" href="{{ url_for('create_promotion', partner_id=partner.partner_id) }}">+ Add promotion</a>
+    {% endif %}
+  </div>
+  <table class="data">
+    <thead><tr><th>Title</th><th>Discount</th><th>Period</th><th></th><th class="ta-r">Actions</th></tr></thead>
+    <tbody>
+      {% for pr in promos %}
+      <tr>
+        <td><strong>{{ pr.title }}</strong>{% if pr.details %}<br><span class="muted">{{ pr.details }}</span>{% endif %}</td>
+        <td>{% if pr.discount_pct %}{{ pr.discount_pct }}%{% else %}—{% endif %}</td>
+        <td>{{ pr.start_date }} → {{ pr.end_date }}</td>
+        <td>
+          {% if pr.start_date <= today <= pr.end_date %}<span class="badge badge-active">live</span>
+          {% elif today < pr.start_date %}<span class="badge badge-pending">upcoming</span>
+          {% else %}<span class="badge badge-closed">ended</span>{% endif %}
+          {% if pr.is_featured %}<span class="tag">★ featured</span>{% endif %}
+        </td>
+        <td class="ta-r">
+          {% if current_role != 'viewer' %}
+          <a class="btn btn-sm" href="{{ url_for('edit_promotion', promotion_id=pr.promotion_id) }}">Edit</a>
+          <form method="post" action="{{ url_for('delete_promotion', promotion_id=pr.promotion_id) }}"
+                style="display:inline" onsubmit="return confirm('Delete this promotion?');">
+            <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="muted ta-c">No promotions yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<p><a class="btn btn-ghost" href="{{ url_for('list_partners') }}">← Back to partners</a></p>
+{% endblock %}
